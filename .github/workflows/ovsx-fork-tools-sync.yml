@@ -78,7 +78,7 @@ jobs:
           BASE_BRANCH: ${{ steps.upstream.outputs.branch }}
         run: |
           # Check if PR already exists
-          EXISTING_PR=$(gh pr list --head upstream-sync --json number --jq '.[0].number')
+          EXISTING_PR=$(gh pr list --head upstream-sync --repo ${{ github.repository }} --json number --jq '.[0].number')
 
           if [ -z "$EXISTING_PR" ]; then
             # Create PR only if it doesn't exist
@@ -90,7 +90,7 @@ jobs:
               --body "Automated sync from ${{ steps.upstream.outputs.url }}."
             
             # Get the newly created PR number
-            PR_NUMBER=$(gh pr list --head upstream-sync --json number --jq '.[0].number')
+            PR_NUMBER=$(gh pr list --head upstream-sync --repo ${{ github.repository }} --json number --jq '.[0].number')
           else
             echo "PR already exists: #$EXISTING_PR"
             PR_NUMBER=$EXISTING_PR
@@ -98,7 +98,7 @@ jobs:
 
           # Enable auto-merge
           if [ -n "$PR_NUMBER" ]; then
-            gh pr merge "$PR_NUMBER" --auto --merge
+            gh pr merge "$PR_NUMBER" --repo ${{ github.repository }} --auto --merge
           else
             echo "Error: Failed to create or find PR"
             exit 1
