@@ -2,7 +2,7 @@
   "name": "test-extension",
   "displayName": "Test Extension",
   "description": "A minimal extension for E2E testing",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "original-publisher",
   "engines": {
     "vscode": "^1.60.0"
