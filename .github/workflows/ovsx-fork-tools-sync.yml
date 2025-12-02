@@ -97,3 +97,11 @@ jobs:
           fi
 
           echo "✓ PR #$PR_NUMBER is ready for review"
+
+          # Try to enable auto-merge
+          if gh pr merge "$PR_NUMBER" --repo ${{ github.repository }} --auto --merge; then
+            echo "✓ Auto-merge enabled"
+          else
+            echo "⚠ Auto-merge failed - PR requires manual merge"
+            echo "Please review and merge: https://github.com/${{ github.repository }}/pull/$PR_NUMBER"
+          fi
