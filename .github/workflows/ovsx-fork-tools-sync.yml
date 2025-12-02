@@ -98,7 +98,13 @@ jobs:
 
           # Enable auto-merge
           if [ -n "$PR_NUMBER" ]; then
-            gh pr merge "$PR_NUMBER" --repo ${{ github.repository }} --auto --merge
+            echo "Attempting to enable auto-merge for PR #$PR_NUMBER"
+            if gh pr merge "$PR_NUMBER" --repo ${{ github.repository }} --auto --merge 2>&1; then
+              echo "✓ Auto-merge enabled successfully"
+            else
+              echo "⚠ Auto-merge failed (likely due to missing branch protection rules)"
+              echo "PR #$PR_NUMBER created successfully but requires manual merge"
+            fi
           else
             echo "Error: Failed to create or find PR"
             exit 1
