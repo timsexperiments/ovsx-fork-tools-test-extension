@@ -77,16 +77,29 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BASE_BRANCH: ${{ steps.upstream.outputs.branch }}
         run: |
-          gh pr create \
-            --base $BASE_BRANCH \
-            --head upstream-sync \
-            --title "chore: sync with upstream" \
-            --body "Automated sync from ${{ steps.upstream.outputs.url }}." || echo "PR already exists"
+          # Check if PR already exists
+          EXISTING_PR=$(gh pr list --head upstream-sync --json number --jq '.[0].number')
 
-          # Enable auto-merge (use the PR number or branch)
-          PR_NUMBER=$(gh pr list --head upstream-sync --json number --jq '.[0].number')
+          if [ -z "$EXISTING_PR" ]; then
+            # Create PR only if it doesn't exist
+            gh pr create \
+              --base $BASE_BRANCH \
+              --head upstream-sync \
+              --repo ${{ github.repository }} \
+              --title "chore: sync with upstream" \
+              --body "Automated sync from ${{ steps.upstream.outputs.url }}."
+            
+            # Get the newly created PR number
+            PR_NUMBER=$(gh pr list --head upstream-sync --json number --jq '.[0].number')
+          else
+            echo "PR already exists: #$EXISTING_PR"
+            PR_NUMBER=$EXISTING_PR
+          fi
+
+          # Enable auto-merge
           if [ -n "$PR_NUMBER" ]; then
             gh pr merge "$PR_NUMBER" --auto --merge
           else
-            echo "No PR found for upstream-sync branch"
+            echo "Error: Failed to create or find PR"
+            exit 1
           fi
