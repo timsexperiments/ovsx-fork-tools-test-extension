@@ -12,5 +12,5 @@
   "scripts": {
     "build": "echo 'building...'"
   },
-  "version": "0.0.6"
+  "version": "0.0.7"
 }
